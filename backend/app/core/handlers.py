@@ -1,21 +1,26 @@
+import logging
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.exceptions import ETFApplicationError
 
-# custom errors
+logger = logging.getLogger(__name__)
+
+
 async def business_exception_handler(request: Request, exc: ETFApplicationError):
+    """Custom business error handler"""
+    logger.warning(f"{exc.error_code}: {exc.message} at {request.url}")
     return JSONResponse(
         status_code=exc.status_code,
         content={
             "status": "error",
             "message": exc.message,
-            "error_type": exc.__class__.__name__ # class name as error type
+            "error_type": exc.error_code
         }
     )
 
-# FastAPI/Starlette HTTP errors (404 Not Found etc.)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """FastAPI HTTP error handler (e.g. 404 Not Found)"""
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -25,8 +30,10 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         }
     )
 
-# any unexpected server/python errors (500 Internal Server Error)
 async def general_exception_handler(request: Request, exc: Exception):
+    """Unexpected server error handler"""
+    logger.error(f"UNEXPECTED_ERROR: {str(exc)}", exc_info=True)
+
     return JSONResponse(
         status_code=500,
         content={

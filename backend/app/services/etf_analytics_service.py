@@ -1,7 +1,7 @@
 import pandas as pd
 from io import StringIO
 from app.repositories.price_repository import PriceRepository
-from app.core.exceptions import ETFApplicationError, InvalidFileError
+from app.core.exceptions import ETFApplicationError, InvalidFileError, ValidationError
 
 class ETFAnalyticsService:
     """
@@ -28,7 +28,7 @@ class ETFAnalyticsService:
         missing = list(set(input_constituents) - set(available_constituents))
 
         if missing:
-            raise ETFApplicationError(f"Unsupported tickers: {', '.join(missing)}")
+            raise ValidationError(f"Unsupported constituents: {', '.join(missing)}")
         
         # 3. Calculations
         # - Reconstruct ETF Price History (Time Series)
@@ -44,7 +44,7 @@ class ETFAnalyticsService:
         return {
             "reconstructed_history": history.to_dict(),
             "all_constituents": enriched_df.to_dict(orient='records'),
-            "top_holdings": top_5.to_dict(orient='records')
+            "top_5_holdings": top_5.to_dict(orient='records')
         }
 
 
@@ -61,6 +61,10 @@ class ETFAnalyticsService:
             raise InvalidFileError(f"Invalid CSV format: {str(e)}")
     
     def _validate_weights(self, etf_df: pd.DataFrame):
+        if etf_df['weight'].isnull().any():
+            missing_constituents = etf_df[etf_df['weight'].isnull()]['name'].tolist()
+            raise InvalidFileError(f"Missing weight values for: {', '.join(missing_constituents)}")
+        
         total_weight = etf_df['weight'].sum()
         # Using 20bps tolerance for potential floating point errors
         if not (0.998 <= total_weight <= 1.002):
