@@ -42,7 +42,7 @@ def test_analyze_etf_endpoint_success(override_etf_service, mock_service):
     """ 
     csv_data = "name,weight\nAAPL,0.5\nMSFT,0.5"
     response = client.post(
-        "/api/v1/etf/analyze_etf",
+        "/api/v1/analyze_etf",
         files={"file": ("ETF_test.csv", csv_data, "text/csv")}
     )
 
@@ -58,7 +58,7 @@ def test_analyze_etf_endpoint_invalid_extension():
     """
 
     response = client.post(
-        "/api/v1/etf/analyze_etf",
+        "/api/v1/analyze_etf",
         files={"file": ("test.txt", "test file", "text/plain")}
     )
 
