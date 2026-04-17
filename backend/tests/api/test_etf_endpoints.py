@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.api.etf_endpoints import get_etf_service
 from unittest.mock import MagicMock
+from app.schemas.etf_schema import ConstituentSchema, ETFAnalysisData,  ETFAnalysisResponse, ErrorResponse
 
 client = TestClient(app)
 
@@ -12,20 +13,19 @@ def mock_service():
     mock service
     """
     service = MagicMock()
-    mock_result = {
-        "reconstructed_history": {
-            "2026-04-01": 150.0, # (100*0.5 + 200*0.5)
-            "2026-04-02": 160.0  # (110*0.5 + 210*0.5)
+    all_constituents = [
+        ConstituentSchema(name="MSFT", weight=0.5, latest_close_price=210.0, holding_size=105.0),
+        ConstituentSchema(name="AAPL", weight=0.5, latest_close_price=110.0, holding_size=55.0)
+    ]
+
+    mock_result = ETFAnalysisData(
+        reconstructed_history={
+            "2026-04-01": 150.0,
+            "2026-04-02": 160.0
         },
-        "all_constituents": [
-            {"name": "MSFT", "weight": 0.5, "latest_close_price": 210.0, "holding_size": 105.0},
-            {"name": "AAPL", "weight": 0.5, "latest_close_price": 110.0, "holding_size": 55.0}
-        ],
-        "top_5_holdings": [
-            {"name": "MSFT", "holding_size": 105.0},
-            {"name": "AAPL", "holding_size": 55.0}
-        ]
-    }
+        all_constituents=all_constituents,
+        top_5_holdings=all_constituents
+    )
     service.analyze_etf.return_value = mock_result
     return service
 
@@ -47,10 +47,13 @@ def test_analyze_etf_endpoint_success(override_etf_service, mock_service):
     )
 
     assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "success"
-    assert data["data"]["reconstructed_history"]["2026-04-02"] == 160.0
-    assert data["data"]["top_5_holdings"][0]["name"] == "MSFT"
+    validated_response = ETFAnalysisResponse(**response.json())
+    assert validated_response.status == "success"
+
+    analysis_data = validated_response.data
+    assert analysis_data.reconstructed_history["2026-04-02"] == 160.0
+
+    assert len(analysis_data.all_constituents) == 2
 
 def test_analyze_etf_endpoint_invalid_extension():
     """
@@ -61,7 +64,9 @@ def test_analyze_etf_endpoint_invalid_extension():
         "/api/v1/analyze_etf",
         files={"file": ("test.txt", "test file", "text/plain")}
     )
-
-    assert "Only CSV files are supported" in response.json()["message"]
-    assert response.json()["error_type"] == "INVALID_FILE_ERROR"
     assert response.status_code == 400
+    error_response = ErrorResponse(**response.json())
+    
+    assert error_response.status == "error"
+    assert "Only CSV files are supported" in error_response.message
+    assert error_response.error_type == "INVALID_FILE_ERROR"

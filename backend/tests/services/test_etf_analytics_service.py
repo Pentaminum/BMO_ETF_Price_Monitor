@@ -3,6 +3,7 @@ import pandas as pd
 from unittest.mock import MagicMock
 from app.services.etf_analytics_service import ETFAnalyticsService
 from app.core.exceptions import ValidationError, InvalidFileError, ETFApplicationError
+from app.schemas.etf_schema import ETFAnalysisData, ConstituentSchema
 
 @pytest.fixture
 def mock_repo():
@@ -39,23 +40,23 @@ def test_analyze_etf_success(mock_repo):
     
     result = service.analyze_etf(csv_content)
     
-    assert "reconstructed_history" in result
-    assert "all_constituents" in result
-    assert "top_5_holdings" in result
+    assert isinstance(result, ETFAnalysisData)
 
-    # (110 * 0.5) + (210 * 0.5) = 160.0
-    assert result["reconstructed_history"]["2026-04-02"] == 160.0
+    assert "2026-04-02" in result.reconstructed_history
+    assert result.reconstructed_history["2026-04-02"] == 160.0 # (110 * 0.5) + (210 * 0.5) = 160.0
 
-    assert len(result["all_constituents"]) == 2
+    assert len(result.all_constituents) == 2
+    assert isinstance(result.all_constituents[0], ConstituentSchema)
 
-    top_holdings = result["top_5_holdings"]
+    top_holdings = result.top_5_holdings
     assert len(top_holdings) == 2
 
-    assert top_holdings[0]["name"] == "MSFT"
-    assert top_holdings[0]["holding_size"] == 105.0
-    assert top_holdings[0]["latest_close_price"] == 210.0
-    assert top_holdings[1]["name"] == "AAPL"
-    assert top_holdings[1]["holding_size"] == 55.0
+    # MSFT > AAPL
+    assert top_holdings[0].name == "MSFT"
+    assert top_holdings[0].holding_size == 105.0
+    assert top_holdings[0].latest_close_price == 210.0
+    assert top_holdings[1].name == "AAPL"
+    assert top_holdings[1].holding_size == 55.0
 
 def test_analyze_etf_invalid_csv(mock_repo):
     """
