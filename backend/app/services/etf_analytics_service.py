@@ -1,7 +1,10 @@
 import pandas as pd
+import logging
 from io import StringIO
 from app.repositories.price_repository import PriceRepository
 from app.core.exceptions import ETFApplicationError, InvalidFileError, ValidationError
+
+logger = logging.getLogger(__name__)
 
 class ETFAnalyticsService:
     """
@@ -12,12 +15,19 @@ class ETFAnalyticsService:
         self.price_repo = price_repository
         # Pre-load historical prices to memory for performance optimization
         self._prices_df = self.price_repo.get_all_prices()
+        if self._prices_df.empty:
+            raise ETFApplicationError(
+                    message="Internal price database is missing or empty.",
+                    error_code="INTERNAL_SERVER_ERROR",
+                    status_code=500
+                )
 
     def analyze_etf(self, csv_content: str) -> Dict[str, Any]:
         """
         Main entry point for ETF analysis.
         Returns calculated history, table data, and top holdings.
         """
+        logger.info("Starting ETF analysis request")
         # 1. Parsing & Validation
         etf_df = self._parse_composition_csv(csv_content)
         self._validate_weights(etf_df)
@@ -39,6 +49,8 @@ class ETFAnalyticsService:
 
         # - Get Top 5 Holdings (Bar Chart)
         top_5 = self._get_top_holdings(enriched_df, top_n=5)
+
+        logger.info(f"Analysis complete for {len(input_constituents)} constituents.")
 
         # 4. Return formatted response for Frontend
         return {
@@ -68,7 +80,7 @@ class ETFAnalyticsService:
         total_weight = etf_df['weight'].sum()
         # Using 20bps tolerance for potential floating point errors
         if not (0.998 <= total_weight <= 1.002):
-            raise ETFApplicationError(f"Invalid weight sum: {total_weight:.4f}. Must be ~1.0")
+            raise ValidationError(f"Invalid weight sum: {total_weight:.4f}. Must be ~1.0")
         
     def _calculate_price_history(self, etf_df: pd.DataFrame, constituents: List[str]) -> pd.Series:
         """Reconstructs ETF daily prices using weighted sum of constituents."""

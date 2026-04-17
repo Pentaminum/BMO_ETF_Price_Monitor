@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 from pathlib import Path
 
@@ -21,8 +21,6 @@ class Settings(BaseSettings):
     DATABASE_URL: Optional[str] = None 
 
     # To be used when .env file exists
-    class Config:
-        env_file = ".env"
-        extra = "ignore" 
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
