@@ -3,6 +3,7 @@ import logging
 from io import StringIO
 from app.repositories.price_repository import PriceRepository
 from app.core.exceptions import ETFApplicationError, InvalidFileError, ValidationError
+from app.schemas.etf_schema import ETFAnalysisData, ConstituentSchema
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +23,13 @@ class ETFAnalyticsService:
                     status_code=500
                 )
 
-    def analyze_etf(self, csv_content: str) -> Dict[str, Any]:
+    def analyze_etf(self, csv_content: str) -> ETFAnalysisData:
         """
         Main entry point for ETF analysis.
         Returns calculated history, table data, and top holdings.
         """
         logger.info("Starting ETF analysis request")
+
         # 1. Parsing & Validation
         etf_df = self._parse_composition_csv(csv_content)
         self._validate_weights(etf_df)
@@ -52,13 +54,12 @@ class ETFAnalyticsService:
 
         logger.info(f"Analysis complete for {len(input_constituents)} constituents.")
 
-        # 4. Return formatted response for Frontend
-        return {
-            "reconstructed_history": history.to_dict(),
-            "all_constituents": enriched_df.to_dict(orient='records'),
-            "top_5_holdings": top_5.to_dict(orient='records')
-        }
-
+        # 4. Return Schema Models
+        return ETFAnalysisData(
+            reconstructed_history=history.to_dict(),
+            all_constituents=[ConstituentSchema(**item) for item in enriched_df.to_dict(orient='records')],
+            top_5_holdings=[ConstituentSchema(**item) for item in top_5.to_dict(orient='records')]
+        )
 
     # --- Private Calculation Methods ---
     
