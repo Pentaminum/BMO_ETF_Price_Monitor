@@ -80,7 +80,7 @@ class ETFAnalyticsService:
         total_weight = etf_df['weight'].sum()
         # Using 20bps tolerance for potential floating point errors
         if not (0.998 <= total_weight <= 1.002):
-            raise ETFApplicationError(f"Invalid weight sum: {total_weight:.4f}. Must be ~1.0")
+            raise ValidationError(f"Invalid weight sum: {total_weight:.4f}. Must be ~1.0")
         
     def _calculate_price_history(self, etf_df: pd.DataFrame, constituents: List[str]) -> pd.Series:
         """Reconstructs ETF daily prices using weighted sum of constituents."""
