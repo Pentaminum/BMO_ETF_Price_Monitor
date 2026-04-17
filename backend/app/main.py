@@ -15,14 +15,3 @@ app.add_middleware(
 
 setup_exception_handlers(app)
 app.include_router(etf_router)
-
-@app.get("/", tags=["Health Check"])
-async def health_check():
-    """
-    Service health check endpoint to verify the server is running.
-    """
-    return {
-        "status": "online",
-        "message": "BMO ETF Analytics Backend is running fine.",
-        "version": "1.0.0"
-    }
