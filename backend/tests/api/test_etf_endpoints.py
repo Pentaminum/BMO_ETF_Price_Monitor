@@ -36,7 +36,7 @@ def override_etf_service(mock_service):
     yield
     app.dependency_overrides = {} # reset regardless of test result
 
-def test_analyze_etf_endpoint_success(mock_service):
+def test_analyze_etf_endpoint_success(override_etf_service, mock_service):
     """
     Unit test for successful API call
     """ 
