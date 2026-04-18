@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { PageLayout } from '../components/common/PageLayout';
 import client from '../api/apiClient';
 
-const Page = () => {
+const ETFMonitorPage = () => {
   const [message, setMessage] = useState('');
   const [isOnline, setIsOnline] = useState(false);
 
@@ -31,4 +31,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default ETFMonitorPage;
