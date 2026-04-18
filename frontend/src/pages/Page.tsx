@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { PageLayout } from '../components/common/PageLayout';
-import client from '../api/client';
+import client from '../api/apiClient';
 
 const Page = () => {
   const [message, setMessage] = useState('');
