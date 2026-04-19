@@ -1,32 +1,12 @@
-import { useEffect, useState } from 'react';
 import { PageLayout } from '../components/common/PageLayout';
-import client from '../api/apiClient';
+import { useHealthCheck } from '../hooks/useHealthCheck';
 
 const ETFMonitorPage = () => {
-  const [message, setMessage] = useState('');
-  const [isOnline, setIsOnline] = useState(false);
-
-  useEffect(() => {
-    client.get('/')
-      .then(res => {
-        setMessage(res.data?.message || 'Connected!');
-        setIsOnline(res.data?.status === 'online');
-      })
-      .catch(() => {
-        setMessage('Backend Offline');
-        setIsOnline(false);
-      });
-  }, []);
+  const isOnline = useHealthCheck();
 
     return (
-      <PageLayout>
+      <PageLayout isOnline={isOnline}>
         <h1>BMO ETF Price Monitor</h1>
-        <div>
-          <span>
-            {isOnline ? 'Online' : 'Offline'}
-          </span>
-          <p>{message}</p>
-        </div>
       </PageLayout>
     );
 };
