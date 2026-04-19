@@ -1,9 +1,9 @@
-import Page from './pages/Page';
+import ETFMonitorPage from './pages/ETFMonitorPage';
 import './App.css';
 
 function App() {
   return (
-    <Page />
+    <ETFMonitorPage />
   );
 }
 
