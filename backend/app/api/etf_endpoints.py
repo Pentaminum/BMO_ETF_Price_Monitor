@@ -23,6 +23,7 @@ async def health_check():
 
 @router.post(
     "/analyze_etf",
+    tags=["ETF Analysis"],
     response_model=ETFAnalysisResponse,
     responses={
         400: {

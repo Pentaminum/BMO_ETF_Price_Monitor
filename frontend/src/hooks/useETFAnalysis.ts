@@ -14,7 +14,7 @@ export const useETFAnalysis = () => {
       formData.append('file', file);
       
       const { data } = await apiClient.post<ETFAnalysisResponse>(
-        '/api/v1/analyze_etf', 
+        'analyze_etf', 
         formData,
         {
           headers: {

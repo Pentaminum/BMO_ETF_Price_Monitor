@@ -76,7 +76,7 @@ class ETFAnalyticsService:
     def _validate_weights(self, etf_df: pd.DataFrame):
         if etf_df['weight'].isnull().any():
             missing_constituents = etf_df[etf_df['weight'].isnull()]['name'].tolist()
-            raise InvalidFileError(f"Missing weight values for: {', '.join(missing_constituents)}")
+            raise InvalidFileError(f"Missing weight values for constituents: {', '.join(missing_constituents)}")
         
         total_weight = etf_df['weight'].sum()
         # Using 20bps tolerance for potential floating point errors
