@@ -38,17 +38,19 @@ const ETFMonitorPage = () => {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <section className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm min-h-[400px] flex flex-col">
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Top 5 Holdings</h2>
-            <div className="flex-1 bg-slate-50 rounded-2xl flex items-center justify-center border border-dashed border-slate-200">
-              {/* top holdings chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <section className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm h-[650px] flex flex-col overflow-hidden">
+            <h2 className="text-lg font-bold text-slate-800 mb-6">Top 5 Holdings</h2>
+            <div className="flex-1 w-full overflow-hidden">
+              <TopHoldingsBarChart holdings={data?.data?.top_5_holdings || []} />
             </div>
           </section>
 
-          <section className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm min-h-[400px]">
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Constituents Details</h2>
-            <ConstituentsTable list={data?.data?.all_constituents || []} />
+          <section className="lg:col-span-1 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm h-[650px] flex flex-col">
+            <h2 className="text-lg font-bold text-slate-800 mb-6">Constituents Details</h2>
+            <div className="flex-1 overflow-hidden">
+              <ConstituentsTable list={data?.data?.all_constituents || []} />
+            </div>
           </section>
         </div>
       </div>

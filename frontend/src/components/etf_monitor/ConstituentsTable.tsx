@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import type { Constituent } from '../../types/etf_data';
 
 interface ConsStituentsTableProps {
@@ -75,19 +75,19 @@ export const ConstituentsTable = ({ list }: ConsStituentsTableProps) => {
                 className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors w-[40%]"
                 onClick={() => handleSort('name')}
               >
-                <div className="flex items-center">Name {renderSortIcon('name')}</div>
+                <div className="flex items-center">CONSTITUENT NAME {renderSortIcon('name')}</div>
               </th>
               <th 
                 className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors w-[30%]"
                 onClick={() => handleSort('weight')}
               >
-                <div className="flex items-center">Weight {renderSortIcon('weight')}</div>
+                <div className="flex items-center">WEIGHT {renderSortIcon('weight')}</div>
               </th>
               <th 
                 className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors text-right w-[30%]"
                 onClick={() => handleSort('latest_close_price')}
               >
-                <div className="flex items-center justify-end">Price {renderSortIcon('latest_close_price')}</div>
+                <div className="flex items-center justify-end">MOST RECENT CLOSE PRICE {renderSortIcon('latest_close_price')}</div>
               </th>
             </tr>
           </thead>
@@ -109,7 +109,7 @@ export const ConstituentsTable = ({ list }: ConsStituentsTableProps) => {
         {/* Empty State Display */}
         {displayList.length === 0 && (
           <div className="py-12 text-center text-slate-400 text-sm italic">
-            No matching constituents found.
+            No constituent details available.
           </div>
         )}
       </div>
