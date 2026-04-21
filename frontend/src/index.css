@@ -1,18 +1,12 @@
 @import "tailwindcss";
-.recharts-wrapper, 
-.recharts-surface, 
-.recharts-layer, 
-.recharts-bar-rectangle, 
-.recharts-text,
-svg, 
-path, 
-rect, 
-text {
-  outline: none !important;
-  -webkit-tap-highlight-color: transparent;
-}
-
-*:focus, *:active {
+.recharts-wrapper:focus,
+.recharts-wrapper *:focus,
+.recharts-surface:focus,
+.recharts-bar-rectangle:focus,
+.recharts-text:focus,
+.recharts-cartesian-axis-tick-value:focus,
+.recharts-layer:focus {
   outline: none !important;
   box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
