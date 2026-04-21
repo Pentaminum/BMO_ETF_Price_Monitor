@@ -8,7 +8,7 @@ A robust full-stack application designed to monitor ETF components, prices, and 
 
 The easiest way to run the entire stack is using Docker Compose. This will spin up both the frontend and backend simultaneously.
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 The application will be available at ```http://localhost:5173```.
 
