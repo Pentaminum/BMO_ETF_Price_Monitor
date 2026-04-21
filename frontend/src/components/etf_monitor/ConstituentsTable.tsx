@@ -72,19 +72,19 @@ export const ConstituentsTable = ({ list }: ConsStituentsTableProps) => {
           <thead className="sticky top-0 bg-slate-50 border-b border-slate-100 z-10">
             <tr>
               <th 
-                className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors w-[40%]"
+                className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-[#0078c1] transition-colors w-[40%]"
                 onClick={() => handleSort('name')}
               >
                 <div className="flex items-center">CONSTITUENT NAME {renderSortIcon('name')}</div>
               </th>
               <th 
-                className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors w-[30%]"
+                className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-[#0078c1] transition-colors w-[30%]"
                 onClick={() => handleSort('weight')}
               >
                 <div className="flex items-center">WEIGHT {renderSortIcon('weight')}</div>
               </th>
               <th 
-                className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors text-right w-[30%]"
+                className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-[#0078c1] transition-colors text-right w-[30%]"
                 onClick={() => handleSort('latest_close_price')}
               >
                 <div className="flex items-center justify-end">MOST RECENT CLOSE PRICE {renderSortIcon('latest_close_price')}</div>

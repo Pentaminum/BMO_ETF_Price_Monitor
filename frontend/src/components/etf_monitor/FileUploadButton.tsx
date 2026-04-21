@@ -34,7 +34,7 @@ export const FileUploadButton = ({ onFileSelect, isPending }: FileUploadProps) =
       flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm
       ${isPending 
         ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
-        : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 cursor-pointer'}
+        : 'bg-[#0078c1] text-white hover:opacity-80 active:scale-95 cursor-pointer'}
     `}>
       {isPending ? (
         <>

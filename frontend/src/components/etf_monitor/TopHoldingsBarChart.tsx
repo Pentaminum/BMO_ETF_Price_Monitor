@@ -118,7 +118,7 @@ export const TopHoldingsBarChart = ({ holdings }: Props) => {
                 content={<CustomTooltip />} 
             />
 
-            <Bar dataKey="size" fill="#2563eb" radius={[0, 6, 6, 0]} barSize={40} animationDuration={500}>
+            <Bar dataKey="size" fill="#0078c1" radius={[0, 6, 6, 0]} barSize={40} animationDuration={500}>
                 <LabelList 
                 dataKey="size" 
                 position="right" 

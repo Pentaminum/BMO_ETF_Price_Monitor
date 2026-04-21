@@ -33,8 +33,8 @@ const ETFMonitorPage = () => {
       <div className="space-y-8">
         <section className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm min-h-[400px] flex flex-col">
           <h2 className="text-lg font-bold text-slate-800 mb-4">ETF Price History</h2>
-          <div className="flex-1 bg-slate-50 rounded-2xl flex items-center justify-center border border-dashed border-slate-200">
-            {/* price history series plot */}
+          <div className="flex-1 w-full overflow-hidden">
+            <ETFPriceChart chartData={data?.data?.reconstructed_history || {}} />
           </div>
         </section>
 

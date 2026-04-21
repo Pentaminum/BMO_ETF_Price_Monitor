@@ -1,4 +1,5 @@
 import React from 'react';
+import bmoLogo from '../../assets/BMO_Logo.png';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -9,8 +10,12 @@ const Header = ({ isOnline }: { isOnline: boolean }) => (
   <header className="bg-white border-b border-slate-200 px-6 py-4">
     <div className="mx-auto max-w-8xl flex justify-between items-center">
 
-      <div className="flex items-center gap-2">
-        <h1 className="text-lg font-bold text-slate-800">ETF Price Monitor</h1>
+      <div className="flex items-center">
+        <img 
+          src={bmoLogo} 
+          alt="BMO Logo" 
+          className="h-8 w-auto object-contain" 
+        />
       </div>
 
       <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
