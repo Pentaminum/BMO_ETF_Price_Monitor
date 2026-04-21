@@ -1,5 +1,4 @@
 import pandas as pd
-import os
 import logging
 from pathlib import Path
 from app.core.config import settings
