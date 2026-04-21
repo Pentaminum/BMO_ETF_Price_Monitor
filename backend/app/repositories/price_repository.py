@@ -28,7 +28,6 @@ class PriceRepository:
         path = Path(settings.DATA_PRICE_PATH)
 
         if not path.exists():
-            logger.error(f"Price data file not found at {path}")
             raise ETFApplicationError(
                 message="Internal price database is missing or empty.",
                 error_code="INTERNAL_SERVER_ERROR",
@@ -46,11 +45,10 @@ class PriceRepository:
             )
 
         if df.empty:
-            logger.error(f"Price data CSV is empty at {path}")
             raise ETFApplicationError(
                 message="Internal price database is missing or empty.",
                 error_code="INTERNAL_SERVER_ERROR",
                 status_code=500,
             )
 
-        return df # Placeholder for future Database implementation (e.g., SQLAlchemy)
+        return df

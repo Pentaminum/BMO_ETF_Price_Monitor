@@ -1,8 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.handlers import setup_exception_handlers
 from app.api.etf_endpoints import router as etf_router, get_etf_service
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    get_etf_service() # uploads ETF data in memory when server starts
+    yield
 
 app = FastAPI(title="BMO ETF Analytics API")
 
@@ -17,10 +23,6 @@ app.add_middleware(
 )
 
 setup_exception_handlers(app)
-@app.on_event("startup")
-def preload_dependencies():
-    get_etf_service()
-
 app.include_router(etf_router)
 
 @app.get("/health", tags=["Health Check"])

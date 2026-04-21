@@ -1,15 +1,16 @@
 import pytest
 import pandas as pd
+import io
 from unittest.mock import MagicMock
 from app.services.etf_analytics_service import ETFAnalyticsService
-from app.core.exceptions import ValidationError, InvalidFileError, ETFApplicationError
+from app.core.exceptions import ValidationError, InvalidFileError
 from app.schemas.etf_schema import ETFAnalysisData, ConstituentSchema
 
 @pytest.fixture
 def mock_repo():
     """mock repository"""
     repo = MagicMock()
-    # set to return propert prices
+    # set to return proper prices
     mock_data = pd.DataFrame(
         {"AAPL": [100, 110], "MSFT": [200, 210]},
         index=pd.Index(["2026-04-01", "2026-04-02"], name="DATE")
@@ -22,7 +23,7 @@ def test_analyze_etf_success(mock_repo):
     Unit test for a valid csv file.
     """
     service = ETFAnalyticsService(mock_repo)
-    csv_content = "name,weight\nAAPL,0.5\nMSFT,0.5"
+    csv_content = io.BytesIO(b"name,weight\nAAPL,0.5\nMSFT,0.5")
     
     result = service.analyze_etf(csv_content)
     
@@ -49,7 +50,7 @@ def test_analyze_etf_invalid_csv_columns(mock_repo):
     Unit test for invalid CSV with wrong column names.
     """
     service = ETFAnalyticsService(mock_repo)
-    wrong_columns_csv = "ticker,percent\nAAPL,0.5\nMSFT,0.5"
+    wrong_columns_csv = io.BytesIO(b"ticker,percent\nAAPL,0.5\nMSFT,0.5")
 
     with pytest.raises(InvalidFileError) as exc:
         service.analyze_etf(wrong_columns_csv)
@@ -63,7 +64,7 @@ def test_analyze_etf_empty_csv(mock_repo):
     Unit test for empty uploaded CSV content.
     """
     service = ETFAnalyticsService(mock_repo)
-    empty_csv = "name,weight\n"
+    empty_csv = io.BytesIO(b"name,weight\n")
 
     with pytest.raises(InvalidFileError) as exc:
         service.analyze_etf(empty_csv)
@@ -77,7 +78,7 @@ def test_analyze_etf_missing_constituent_name(mock_repo):
     Unit test for missing constituent name.
     """
     service = ETFAnalyticsService(mock_repo)
-    bad_csv = "name,weight\n,0.5\nMSFT,0.5"
+    bad_csv = io.BytesIO(b"name,weight\n,0.5\nMSFT,0.5")
 
     with pytest.raises(InvalidFileError) as exc:
         service.analyze_etf(bad_csv)
@@ -91,7 +92,7 @@ def test_analyze_etf_missing_weight_value(mock_repo):
     Unit test for missing weight values.
     """
     service = ETFAnalyticsService(mock_repo)
-    bad_csv = "name,weight\nAAPL,\nMSFT,1.0"
+    bad_csv = io.BytesIO(b"name,weight\nAAPL,\nMSFT,1.0")
 
     with pytest.raises(InvalidFileError) as exc:
         service.analyze_etf(bad_csv)
@@ -106,7 +107,7 @@ def test_analyze_etf_invalid_weight_value(mock_repo):
     Unit test for non-numeric weight values.
     """
     service = ETFAnalyticsService(mock_repo)
-    bad_csv = "name,weight\nAAPL,abc\nMSFT,1.0"
+    bad_csv = io.BytesIO(b"name,weight\nAAPL,abc\nMSFT,1.0")
 
     with pytest.raises(InvalidFileError) as exc:
         service.analyze_etf(bad_csv)
@@ -121,7 +122,7 @@ def test_analyze_etf_negative_weight_value(mock_repo):
     Unit test for negative weight values.
     """
     service = ETFAnalyticsService(mock_repo)
-    bad_csv = "name,weight\nAAPL,-0.2\nMSFT,1.2"
+    bad_csv = io.BytesIO(b"name,weight\nAAPL,-0.2\nMSFT,1.2")
 
     with pytest.raises(ValidationError) as exc:
         service.analyze_etf(bad_csv)
@@ -136,7 +137,7 @@ def test_analyze_etf_invalid_weight_sum(mock_repo):
     Unit test for weight sum != 1.0 (0.998 ~ 1.002).
     """
     service = ETFAnalyticsService(mock_repo)
-    bad_csv = "name,weight\nAAPL,0.7\nMSFT,0.1" # 0.8    
+    bad_csv = io.BytesIO(b"name,weight\nAAPL,0.7\nMSFT,0.1") # 0.8    
     with pytest.raises(ValidationError) as exc:
         service.analyze_etf(bad_csv)
     
@@ -150,7 +151,7 @@ def test_analyze_etf_unsupported_constituent(mock_repo):
     Unit test for an ETF file with constituents that are not in prices.csv
     """
     service = ETFAnalyticsService(mock_repo)
-    bad_csv = "name,weight\nTSLA,1.0" # not in prices.csv
+    bad_csv = io.BytesIO(b"name,weight\nTSLA,1.0") # not in prices.csv
     
     with pytest.raises(ValidationError) as exc:
         service.analyze_etf(bad_csv)
@@ -159,3 +160,18 @@ def test_analyze_etf_unsupported_constituent(mock_repo):
     assert "TSLA" in str(exc.value.message)
     assert exc.value.error_code == "VALIDATION_ERROR"
     assert exc.value.status_code == 422
+
+def test_analyze_etf_duplicate_constituents(mock_repo):
+    """
+    Unit test for duplicate constituents.
+    """
+    service = ETFAnalyticsService(mock_repo)
+    duplicate_csv = io.BytesIO(b"name,weight\nAAPL,0.2\nAAPL,0.3\nMSFT,0.5")
+    
+    result = service.analyze_etf(duplicate_csv)
+    
+    assert len(result.all_constituents) == 2
+    aapl_constituent = next(c for c in result.all_constituents if c.name == "AAPL")
+    assert aapl_constituent.weight == 0.5
+
+    assert aapl_constituent.holding_size == 55.0

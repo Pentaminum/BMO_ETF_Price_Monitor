@@ -65,12 +65,7 @@ async def analyze_etf(
     if not file.filename or not file.filename.endswith('.csv'):
         raise InvalidFileError("Only CSV files are supported.")
 
-    content = await file.read()
-    if not content:
-        raise InvalidFileError("Uploaded file is empty.")
-    
-    csv_content = content.decode("utf-8")
-    analyzed_etf = etf_service.analyze_etf(csv_content)
+    analyzed_etf = etf_service.analyze_etf(file.file)
     
     return ETFAnalysisResponse(
         status="success",
