@@ -39,7 +39,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
             <div className="space-y-1.5 text-sm text-black font-medium">
             <div className="flex justify-between gap-4">
                 <span className="text-slate-500">Total Value</span>
-                <span className="font-mono font-bold">${Number(data.size).toLocaleString()}</span>
+                <span className="font-mono font-bold text-[#0078c1]">${Number(data.size).toLocaleString()}</span>
             </div>
             <div className="flex justify-between gap-4">
                 <span className="text-slate-500">Weight</span>
@@ -87,7 +87,7 @@ export const TopHoldingsBarChart = ({ holdings }: Props) => {
             <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 0, right: 50, left: 10, bottom: 0 }}
+            margin={{ top: 0, right: 20, left: 55, bottom: 0 }}
             >
             <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={true} stroke="#d1d5db" />
             
@@ -104,13 +104,16 @@ export const TopHoldingsBarChart = ({ holdings }: Props) => {
                 axisLine={{ stroke: '#000000' }}
                 tickLine={false}
                 tick={{ 
-                fontSize: 12, 
-                fill: '#000000', 
-                fontWeight: 800,
-                textAnchor: 'start',
+                    fontSize: 12, 
+                    fill: '#000000', 
+                    fontWeight: 800,
+                    textAnchor: 'end',
                 }}
-                width={40}
-                dx={-30}
+                width={30}
+                dx={-10}
+                tickFormatter={(value) => {
+                    return value.length > 4 ? `${value.substring(0, 4)}...` : value;
+                }}
             />
 
             <Tooltip 
