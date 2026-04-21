@@ -8,10 +8,21 @@ app = FastAPI(title="BMO ETF Analytics API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
 )
 
 setup_exception_handlers(app)
 app.include_router(etf_router)
+
+@app.get("/health", tags=["Health Check"])
+async def health_check():
+    return {
+        "status": "online",
+        "message": "BMO ETF Analytics Backend is running fine.",
+        "version": "1.0.0"
+    }

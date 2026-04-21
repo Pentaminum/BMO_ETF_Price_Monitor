@@ -2,8 +2,9 @@ import pandas as pd
 import logging
 from io import StringIO
 from app.repositories.price_repository import PriceRepository
-from app.core.exceptions import ETFApplicationError, InvalidFileError, ValidationError
+from app.core.exceptions import InvalidFileError, ValidationError
 from app.schemas.etf_schema import ETFAnalysisData, ConstituentSchema
+from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -14,14 +15,7 @@ class ETFAnalyticsService:
     """
     def __init__(self, price_repository: PriceRepository):
         self.price_repo = price_repository
-        # Pre-load historical prices to memory for performance optimization
         self._prices_df = self.price_repo.get_all_prices()
-        if self._prices_df.empty:
-            raise ETFApplicationError(
-                    message="Internal price database is missing or empty.",
-                    error_code="INTERNAL_SERVER_ERROR",
-                    status_code=500
-                )
 
     def analyze_etf(self, csv_content: str) -> ETFAnalysisData:
         """
@@ -66,18 +60,41 @@ class ETFAnalyticsService:
     def _parse_composition_csv(self, csv_content: str) -> pd.DataFrame:
         try:
             df = pd.read_csv(StringIO(csv_content))
-            if not {'name', 'weight'}.issubset(df.columns):
-                raise InvalidFileError("CSV must contain 'name' and 'weight' columns.")
-            return df
         except Exception as e:
-            if isinstance(e, InvalidFileError): raise e
             raise InvalidFileError(f"Invalid CSV format: {str(e)}")
+        
+        if df.empty:
+            raise InvalidFileError("Uploaded CSV file is empty.")
+        
+        required_columns = {'name', 'weight'}
+        if not required_columns.issubset(df.columns):
+            raise InvalidFileError("CSV must contain 'name' and 'weight' columns.")
+
+        if df['name'].isnull().any():
+            raise InvalidFileError("CSV contains missing constituent names.")
+
+        return df
+
     
     def _validate_weights(self, etf_df: pd.DataFrame):
         if etf_df['weight'].isnull().any():
             missing_constituents = etf_df[etf_df['weight'].isnull()]['name'].tolist()
             raise InvalidFileError(f"Missing weight values for constituents: {', '.join(missing_constituents)}")
         
+        numeric_weights = pd.to_numeric(etf_df['weight'], errors='coerce')
+        if numeric_weights.isnull().any():
+            invalid_constituents = etf_df[numeric_weights.isnull()]['name'].tolist()
+            raise InvalidFileError(
+                f"Invalid weight values for constituents: {', '.join(invalid_constituents)}"
+            )
+
+        etf_df['weight'] = numeric_weights
+        if (etf_df['weight'] < 0).any():
+            negative_constituents = etf_df[etf_df['weight'] < 0]['name'].tolist()
+            raise ValidationError(
+                f"Negative weight values found for constituents: {', '.join(negative_constituents)}"
+            )
+
         total_weight = etf_df['weight'].sum()
         # Using 20bps tolerance for potential floating point errors
         if not (0.998 <= total_weight <= 1.002):
