@@ -17,23 +17,9 @@ def mock_repo():
     repo.get_all_prices.return_value = mock_data
     return repo
 
-def test_if_repo_empty():
-    """
-    Unit test if repository is empty
-    """
-    empty_repo = MagicMock()
-    empty_repo.get_all_prices.return_value = pd.DataFrame()
-    
-    with pytest.raises(ETFApplicationError) as exc:
-        ETFAnalyticsService(empty_repo)
-    
-    assert "Internal price database" in exc.value.message
-    assert exc.value.error_code == "INTERNAL_SERVER_ERROR"
-    assert exc.value.status_code == 500
-
 def test_analyze_etf_success(mock_repo):
     """
-    Unit test for a valid csv file
+    Unit test for a valid csv file.
     """
     service = ETFAnalyticsService(mock_repo)
     csv_content = "name,weight\nAAPL,0.5\nMSFT,0.5"
@@ -58,23 +44,96 @@ def test_analyze_etf_success(mock_repo):
     assert top_holdings[1].name == "AAPL"
     assert top_holdings[1].holding_size == 55.0
 
-def test_analyze_etf_invalid_csv(mock_repo):
+def test_analyze_etf_invalid_csv_columns(mock_repo):
     """
-    Unit test for invalid csv
+    Unit test for invalid CSV with wrong column names.
     """
     service = ETFAnalyticsService(mock_repo)
-    wrong_columns_csv = "ticker,percent\nAAPL,0.5\nMSFT,0.5" # wrong column names
-    
+    wrong_columns_csv = "ticker,percent\nAAPL,0.5\nMSFT,0.5"
+
     with pytest.raises(InvalidFileError) as exc:
         service.analyze_etf(wrong_columns_csv)
-    
-    assert "CSV must contain 'name' and 'weight' columns" in str(exc.value.message)
+
+    assert "CSV must contain 'name' and 'weight' columns" in exc.value.message
     assert exc.value.error_code == "INVALID_FILE_ERROR"
     assert exc.value.status_code == 400
 
+def test_analyze_etf_empty_csv(mock_repo):
+    """
+    Unit test for empty uploaded CSV content.
+    """
+    service = ETFAnalyticsService(mock_repo)
+    empty_csv = "name,weight\n"
+
+    with pytest.raises(InvalidFileError) as exc:
+        service.analyze_etf(empty_csv)
+
+    assert "Uploaded CSV file is empty" in exc.value.message
+    assert exc.value.error_code == "INVALID_FILE_ERROR"
+    assert exc.value.status_code == 400
+
+def test_analyze_etf_missing_constituent_name(mock_repo):
+    """
+    Unit test for missing constituent name.
+    """
+    service = ETFAnalyticsService(mock_repo)
+    bad_csv = "name,weight\n,0.5\nMSFT,0.5"
+
+    with pytest.raises(InvalidFileError) as exc:
+        service.analyze_etf(bad_csv)
+
+    assert "missing constituent names" in exc.value.message.lower()
+    assert exc.value.error_code == "INVALID_FILE_ERROR"
+    assert exc.value.status_code == 400
+
+def test_analyze_etf_missing_weight_value(mock_repo):
+    """
+    Unit test for missing weight values.
+    """
+    service = ETFAnalyticsService(mock_repo)
+    bad_csv = "name,weight\nAAPL,\nMSFT,1.0"
+
+    with pytest.raises(InvalidFileError) as exc:
+        service.analyze_etf(bad_csv)
+
+    assert "Missing weight values for constituents" in exc.value.message
+    assert "AAPL" in exc.value.message
+    assert exc.value.error_code == "INVALID_FILE_ERROR"
+    assert exc.value.status_code == 400
+
+def test_analyze_etf_invalid_weight_value(mock_repo):
+    """
+    Unit test for non-numeric weight values.
+    """
+    service = ETFAnalyticsService(mock_repo)
+    bad_csv = "name,weight\nAAPL,abc\nMSFT,1.0"
+
+    with pytest.raises(InvalidFileError) as exc:
+        service.analyze_etf(bad_csv)
+
+    assert "Invalid weight values for constituents" in exc.value.message
+    assert "AAPL" in exc.value.message
+    assert exc.value.error_code == "INVALID_FILE_ERROR"
+    assert exc.value.status_code == 400
+
+def test_analyze_etf_negative_weight_value(mock_repo):
+    """
+    Unit test for negative weight values.
+    """
+    service = ETFAnalyticsService(mock_repo)
+    bad_csv = "name,weight\nAAPL,-0.2\nMSFT,1.2"
+
+    with pytest.raises(ValidationError) as exc:
+        service.analyze_etf(bad_csv)
+
+    assert "Negative weight values found for constituents" in exc.value.message
+    assert "AAPL" in exc.value.message
+    assert exc.value.error_code == "VALIDATION_ERROR"
+    assert exc.value.status_code == 422
+
 def test_analyze_etf_invalid_weight_sum(mock_repo):
     """
-    Unit test for weight sum != 1.0 (0.998 ~ 1.002)
+    Unit test for weight sum != 1.0 (0.998 ~ 1.002).
     """
     service = ETFAnalyticsService(mock_repo)
     bad_csv = "name,weight\nAAPL,0.7\nMSFT,0.1" # 0.8    

@@ -1,14 +1,20 @@
 import { useState, useEffect } from 'react';
-import client from '../api/apiClient';
+import axios from 'axios';
+import { APP_CONFIG } from '../utils/appConfig';
 
 export const useHealthCheck = () => {
   const [isOnline, setIsOnline] = useState(false);
 
   useEffect(() => {
-    const checkStatus = () => {
-      client.get('/')
-        .then(res => setIsOnline(res.data?.status === 'online'))
-        .catch(() => setIsOnline(false));
+    const checkStatus = async () => {
+      try {
+        const res = await axios.get(APP_CONFIG.HEALTH_CHECK_URL, {
+          timeout: APP_CONFIG.API_TIMEOUT,
+        });
+        setIsOnline(res.data?.status === 'online');
+      } catch {
+        setIsOnline(false);
+      }
     };
 
     checkStatus();
