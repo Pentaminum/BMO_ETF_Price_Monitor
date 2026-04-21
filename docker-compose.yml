@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: bmo-etf-backend
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: bmo-etf-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
