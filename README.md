@@ -6,6 +6,7 @@ A robust full-stack application designed to monitor ETF components, prices, and 
 The easiest way to run the entire stack is using Docker Compose.
 ```bash
 docker-compose up --build
+```
 
 ## 🛠 Tech Stack
 - Frontend: React 19, TypeScript, Vite, Tailwind CSS, TanStack Query, Recharts
