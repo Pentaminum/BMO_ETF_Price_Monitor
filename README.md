@@ -61,6 +61,9 @@ The frontend UI will be available at ```http://localhost:5173```.
 ### Frontend: High-Performance Visualization
 - **State Management**: Utilized **TanStack Query** to manage server-state, caching, and reactive loading/error states.
 - **Reactive UI**: Built with **Tailwind CSS** and **Recharts** for the time-series plot and bar charts, providing traders with a responsive and interactive data exploration experience.
+- **Advanced Data Visualization**:
+  - **Interactive Analytics**: Implemented **custom tooltips** for both the price history chart and the top 5 holdings bar chart, providing precise data points and financial metrics on hover.
+  - **Zoomable Time-Series**: Integrated a **Brush** component for the price history chart, allowing traders to seamlessly zoom into specific date ranges for granular analysis.
 
 ## Data Logic & Assumptions
 Given the nature of ETF data and the requirement for precision, the following business rules and assumptions were implemented:
