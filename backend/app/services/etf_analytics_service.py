@@ -1,10 +1,9 @@
 import pandas as pd
 import logging
-from io import StringIO
 from app.repositories.price_repository import PriceRepository
 from app.core.exceptions import InvalidFileError, ValidationError
 from app.schemas.etf_schema import ETFAnalysisData, ConstituentSchema
-from typing import List
+from typing import List, BinaryIO
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +16,7 @@ class ETFAnalyticsService:
         self.price_repo = price_repository
         self._prices_df = self.price_repo.get_all_prices()
 
-    def analyze_etf(self, csv_content: str) -> ETFAnalysisData:
+    def analyze_etf(self, file_obj: BinaryIO) -> ETFAnalysisData:
         """
         Main entry point for ETF analysis.
         Returns calculated history, table data, and top holdings.
@@ -25,8 +24,13 @@ class ETFAnalyticsService:
         logger.info("Starting ETF analysis request")
 
         # 1. Parsing & Validation
-        etf_df = self._parse_composition_csv(csv_content)
+        etf_df = self._parse_composition_csv(file_obj)
         self._validate_weights(etf_df)
+
+        # Aggregate duplicate constituents if any exist
+        if etf_df['name'].duplicated().any():
+            logger.info("Duplicate constituents detected. Aggregating weights.")
+            etf_df = etf_df.groupby('name', as_index=False)['weight'].sum()
 
         # 2. Check Data Availability
         input_constituents = etf_df['name'].unique().tolist()
@@ -57,9 +61,9 @@ class ETFAnalyticsService:
 
     # --- Private Calculation Methods ---
     
-    def _parse_composition_csv(self, csv_content: str) -> pd.DataFrame:
+    def _parse_composition_csv(self, file_obj: BinaryIO) -> pd.DataFrame:
         try:
-            df = pd.read_csv(StringIO(csv_content))
+            df = pd.read_csv(file_obj)
         except Exception as e:
             raise InvalidFileError(f"Invalid CSV format: {str(e)}")
         
@@ -72,6 +76,9 @@ class ETFAnalyticsService:
 
         if df['name'].isnull().any():
             raise InvalidFileError("CSV contains missing constituent names.")
+
+        # Clean names to ensure accurate duplicate detection and price matching
+        df['name'] = df['name'].astype(str).str.strip().str.upper()
 
         return df
 

@@ -47,6 +47,8 @@ def test_analyze_etf_endpoint_success(override_etf_service, mock_service):
     )
 
     assert response.status_code == 200
+    mock_service.analyze_etf.assert_called_once()
+    
     validated_response = ETFAnalysisResponse(**response.json())
     assert validated_response.status == "success"
 
