@@ -16,7 +16,7 @@ docker-compose up --build
 ## Architecture
 ### Backend: Scalable Data Processing
 - **Layered Architecture**: Separated into ```API```, ```Service```, and ```Repository``` layers to decouple business logic from data access, allowing easy migration from CSV to SQL/NoSQL in the future.
-- **Performance Optimization**: The 50MB+ ```prices.csv``` is loaded into memory via **FastAPI Lifespan** on startup. Calculations are performed using n**Pandas vectorized operationn**s, ensuring sub-millisecond response times for price reconstruction.
+- **Performance Optimization**: The 50MB+ ```prices.csv``` is loaded into memory via **FastAPI Lifespan** on startup. Calculations are performed using **Pandas vectorized operationn**s, ensuring sub-millisecond response times for price reconstruction.
 - **Robust Error Handling**: Implemented a global exception handler to convert business logic failures into structured JSON responses, ensuring the frontend handles data gaps gracefully.
 
 ### Frontend: High-Performance Visualization
