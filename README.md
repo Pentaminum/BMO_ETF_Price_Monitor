@@ -21,7 +21,7 @@ docker-compose up --build
 
 ### Frontend: High-Performance Visualization
 - **State Management**: Utilized **TanStack Query** for efficient server-state caching and loading/error states.
-- **Reactive UI**: Built with **Tailwind CS**S and **Recharts** to provide a responsive, interactive experience for traders across different screen sizes.
+- **Reactive UI**: Built with **Tailwind CSS** and **Recharts** to provide a responsive, interactive experience for traders across different screen sizes.
 
 ## Assumptions
 - **Data Integrity**: Implemented a 20bps (0.002) tolerance for ETF weight sums to account for floating-point inaccuracies in financial CSV data.
