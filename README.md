@@ -10,6 +10,7 @@ The easiest way to run the entire stack is using Docker Compose. This will spin 
 ```bash
 docker-compose up --build
 ```
+The application will be available at ```http://localhost:5173```.
 
 **Option 2: Local Development (Manual Setup)**
 
