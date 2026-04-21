@@ -15,7 +15,6 @@ export const FileUploadButton = ({ onFileSelect, isPending }: FileUploadProps) =
 
         if (!file.name.endsWith('.csv')) {
             logger.warn(`Upload blocked: Invalid file type (${file.name})`);
-            alert('Invalid file format. Please upload a .csv file.');
             return;
         }
 
