@@ -60,11 +60,14 @@ The frontend UI will be available at ```http://localhost:5173```.
 - **Global Exception Handling**: A centralized error handling mechanism converts business logic failures into structured JSON responses, ensuring the frontend handles data gaps or validation errors gracefully.
 
 ### Frontend: High-Performance Visualization
-- **State Management**: Utilized **TanStack Query** to manage server-state, caching, and reactive loading/error states.
-- **Reactive UI**: Built with **Tailwind CSS** and **Recharts** for the time-series plot and bar charts, providing traders with a responsive and interactive data exploration experience.
+- **State Management**: Utilized **TanStack Query** to handle ETF analysis requests with built-in loading, success, reset, and error flows.
+- **Interactive Analytics Dashboard**: Built a responsive UI with **Tailwind CSS** and **Recharts**, including a historical price chart, top holdings bar chart, and searchable/sortable constituents table.
+- **Memoized Data Processing**: Leveraged **useMemo** to efficiently transform chart data, compute chart domains, and derive filtered/sorted table views without unnecessary recalculation on every render.
+- **Reusable Frontend Architecture**: Separated API access, custom hooks, layout, and visualization components to keep the page layer focused on orchestration rather than business logic.
 - **Advanced Data Visualization**:
-  - **Interactive Analytics**: Implemented **custom tooltips** for both the price history chart and the top 5 holdings bar chart, providing precise data points and financial metrics on hover.
-  - **Zoomable Time-Series**: Integrated a **Brush** component for the price history chart, allowing traders to seamlessly zoom into specific date ranges for granular analysis.
+  - **Custom Tooltips** for precise hover-based financial insights
+  - **Brush-based zooming** for granular time-series inspection
+  - Error, loading, and empty states for more resilient user interaction
 
 ## Data Logic & Assumptions
 Given the nature of ETF data and the requirement for precision, the following business rules and assumptions were implemented:
