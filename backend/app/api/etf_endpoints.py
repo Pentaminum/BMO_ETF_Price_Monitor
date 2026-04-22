@@ -62,7 +62,7 @@ async def analyze_etf(
     file: UploadFile = File(...),
     etf_service: ETFAnalyticsService = Depends(get_etf_service)
 ):
-    if not file.filename or not file.filename.endswith('.csv'):
+    if not file.filename or not file.filename.lower().endswith(".csv"):
         raise InvalidFileError("Only CSV files are supported.")
 
     analyzed_etf = etf_service.analyze_etf(file.file)

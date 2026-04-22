@@ -55,7 +55,7 @@ The frontend UI will be available at ```http://localhost:5173```.
 ## Architecture
 ### Backend: Scalable Data Processing
 - **Layered Architecture (N-Tier)**: The system is strictly decoupled into **API**, **Service**, and **Repository** layers. This ensures business logic is isolated from data access, allowing for seamless transitions from CSV to relational databases (e.g., PostgreSQL) in the future.
-- **In-Memory Caching**: To ensure sub-millisecond response times, the historical price dataset (~50MB+) is loaded into memory once during the **FastAPI Lifespan** startup phase.
+- **In-Memory Caching**: The historical price dataset (~50MB+) is preloaded during the **FastAPI lifespan** startup phase and reused through a cached service dependency, reducing repeated disk I/O and improving request performance.
 - **Vectorized Computations**: Calculations for ETF price reconstruction are performed using **Pandas vectorized operations**. This bypasses Python’s native loops, providing high-speed financial processing suitable for real-time trading environments.
 - **Global Exception Handling**: A centralized error handling mechanism converts business logic failures into structured JSON responses, ensuring the frontend handles data gaps or validation errors gracefully.
 
