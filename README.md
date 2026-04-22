@@ -46,7 +46,6 @@ npm run dev
 ```
 The frontend UI will be available at ```http://localhost:5173```.
 
-
 ## Tech Stack
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, TanStack Query, Recharts
 - **Backend**: Python 3.12, FastAPI, Pandas, Pydantic (v2)
@@ -87,3 +86,7 @@ Given the nature of ETF data and the requirement for precision, the following bu
 ## API Endpoints
 - ```POST /api/v1/analyze_etf```: Processes CSV upload and returns reconstructed price history, constituent details, and top 5 biggest holdings.
 - ```GET /health```: System heartbeat and dependency check.
+
+## Testing
+- **Frontend**: Tested hooks, API client behavior, and core UI components using **Vitest** and **React Testing Library**.
+- **Backend**: Tested repository, service, and endpoint validation flows using **Pytest**.
