@@ -22,7 +22,7 @@ const ETFMonitorPage = () => {
           </div>
           
           <FileUploadButton
-            onFileSelect={(file) => analyzeEtf(file)} 
+            onFileSelect={analyzeEtf}
             isPending={isPending} 
           />
       </div>
