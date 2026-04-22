@@ -81,7 +81,7 @@ describe('useETFAnalysis', () => {
       wrapper: createWrapper(),
     });
 
-    const file = new File(['ticker,weight\nAAPL,10.5'], 'sample.csv', {
+    const file = new File(['name,weight\nAAPL,0.105'], 'sample.csv', {
       type: 'text/csv',
     });
 
@@ -95,11 +95,6 @@ describe('useETFAnalysis', () => {
     expect(apiClient.post).toHaveBeenCalledWith(
       'analyze_etf',
       expect.any(FormData),
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
     );
 
     expect(result.current.data).toEqual(mockResponse);

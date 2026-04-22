@@ -16,11 +16,6 @@ export const useETFAnalysis = () => {
       const { data } = await apiClient.post<ETFAnalysisResponse>(
         'analyze_etf', 
         formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
       );
       return data;
     },

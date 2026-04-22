@@ -13,11 +13,6 @@ export const FileUploadButton = ({ onFileSelect, isPending }: FileUploadProps) =
     const validateAndProcessFile = (file: File | undefined) => {
         if (!file) return;
 
-        if (!file.name.endsWith('.csv')) {
-            logger.warn(`Upload blocked: Invalid file type (${file.name})`);
-            return;
-        }
-
         logger.info(`Valid CSV selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
         onFileSelect(file);
     }

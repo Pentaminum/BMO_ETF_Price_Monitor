@@ -1,14 +1,14 @@
 import { useState, useMemo } from 'react';
 import type { Constituent } from '../../types/etf_data';
 
-interface ConsStituentsTableProps {
+interface ConstituentsTableProps {
   list: Constituent[];
 }
 
 // Defining allowed keys for sorting to ensure type safety
 type SortKey = 'name' | 'weight' | 'latest_close_price';
 
-export const ConstituentsTable = ({ list }: ConsStituentsTableProps) => {
+export const ConstituentsTable = ({ list }: ConstituentsTableProps) => {
   // --- UI States ---
   const [searchTerm, setSearchTerm] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('weight');
