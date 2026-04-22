@@ -73,14 +73,16 @@ The frontend UI will be available at ```http://localhost:5173```.
 Given the nature of ETF data and the requirement for precision, the following business rules and assumptions were implemented:
 
 - **Strict Weight Validation**:
-  - **Zero-Tolerance for Negative Weights**: Assuming a long-only ETF structure for this challenge, the system strictly rejects negative weight values to ensure data integrity.
-  - **Floating-Point Precision**: To account for standard floating-point inaccuracies in CSV parsing, a **20bps (0.002) tolerance** is applied to the weight sum validation (accepting sums between 0.998 and 1.002).
+  - **Negative Weight Rejection**: Assuming a long-only ETF structure for this challenge, the system rejects any negative constituent weights to preserve data integrity.
+  - **Floating-Point Precision**: To account for standard floating-point inaccuracies in CSV parsing, a **20 bps (0.002) tolerance** is applied to weight-sum validation, accepting totals between **0.998 and 1.002**.
+  - **Missing or Non-Numeric Weight Checks**: The system rejects missing or non-numeric weight values before performing any portfolio calculations.
 - **Data Consistency & Normalization**:
-  - **Input Normalization**: All constituent names are automatically stripped of whitespace and converted to uppercase to prevent matching errors.
-  - **Duplicate Aggregation**: If the uploaded CSV contains duplicate entries for the same constituents, the system automatically aggregates their weights to provide a consolidated view.
+  - **Input Normalization**: All constituent names are automatically trimmed and converted to uppercase to prevent matching errors caused by casing or whitespace differences.
+  - **Duplicate Aggregation**: If the uploaded CSV contains duplicate constituent names, their weights are automatically aggregated to produce a consolidated composition view.
 - **Fail-Safe Mechanisms**:
-  - **Data Availability Check**: The system validates all uploaded constituents against the internal price database. If a constituent is missing, the request triggers a ```422 Validation Error``` to prevent skewed or inaccurate financial analysis.
-  - **Empty File Handling**: Comprehensive checks are in place for empty files or missing required columns (```name```, ```weight```) to maintain server stability.
+  - **Data Availability Check**: Every uploaded constituent is validated against the internal historical price dataset. If any constituent is unsupported or missing from the internal dataset, the request returns a `422 Validation Error` to prevent incomplete or misleading analysis.
+  - **File Integrity Checks**: The system explicitly rejects empty uploads, missing constituent names, and CSV files missing the required `name` and `weight` columns.
+  - **Internal Data Dependency Check**: If the internal price dataset is missing, empty, or invalid, the API fails fast with an internal server error rather than serving partial or unreliable results.
 
 ## API Endpoints
 - ```POST /api/v1/analyze_etf```: Processes CSV upload and returns reconstructed price history, constituent details, and top 5 biggest holdings.
