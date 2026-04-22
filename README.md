@@ -62,7 +62,7 @@ The frontend UI will be available at ```http://localhost:5173```.
 ### Frontend: High-Performance Visualization
 - **State Management**: Utilized **TanStack Query** to handle ETF analysis requests with built-in loading, success, reset, and error flows.
 - **Interactive Analytics Dashboard**: Built a responsive UI with **Tailwind CSS** and **Recharts**, including a historical price chart, top holdings bar chart, and searchable/sortable constituents table.
-- **Memoized Data Processing**: Leveraged **useMemo** to efficiently transform chart data, compute chart domains, and derive filtered/sorted table views without unnecessary recalculation on every render.
+- **Memoized Data Processing**: Leveraged ```useMemo``` to efficiently transform chart data, compute chart domains, and derive filtered/sorted table views without unnecessary recalculation on every render.
 - **Reusable Frontend Architecture**: Separated API access, custom hooks, layout, and visualization components to keep the page layer focused on orchestration rather than business logic.
 - **Advanced Data Visualization**:
   - **Custom Tooltips** for precise hover-based financial insights
